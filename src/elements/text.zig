@@ -24,7 +24,7 @@ pub const Text = struct {
     pub fn update(self: *Text, state: anytype) !void {}
 
     pub fn render(self: *Text, result: *BuildResult) !void {
-        print("text {} \n", .{self.text});
+
         try result.add(MeshData{
             .vertices = &[_]Vertex{
                 Vertex{ .position = Vec3.new(self.x, self.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },

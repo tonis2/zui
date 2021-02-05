@@ -1,9 +1,10 @@
 const std = @import("std");
 usingnamespace @import("../math.zig");
 const Allocator = std.mem.Allocator;
+const print = std.debug.print;
 
 pub const Element = struct {
-    tag: type,
+    name: []const u8,
     ptr: usize,
 };
 
@@ -14,6 +15,7 @@ pub const Grid = struct {
     y: u32,
     columns: u32,
     rows: u32,
+    children: std.ArrayList(Element),
 
     pub fn new(data: struct { width: u32 = 0, height: u32 = 0, x: u32 = 0, y: u32 = 0, columns: u32, rows: u32 }, allocator: *Allocator) Grid {
         return Grid{
@@ -23,17 +25,28 @@ pub const Grid = struct {
             .y = data.y,
             .columns = data.columns,
             .rows = data.rows,
+            .children = std.ArrayList(Element).init(allocator),
         };
     }
 
-    // pub fn add_child(self: *Grid, element: anytype) !void {
-    //     try self.children.append(Element{
-    //         .tag = @TypeOf(element),
-    //         .prt = @ptrToInt(&element),
-    //     });
-    // }
+    pub fn child(self: *Grid, element: anytype) *Grid {
+        self.children.append(Element{
+            .name = @typeName(@TypeOf(element)),
+            .ptr = @ptrToInt(&element),
+        }) catch unreachable;
+        return self;
+    }
 
-    pub fn update(self: *Grid, state: anytype) !void {}
+    pub fn update(self: *Grid, fields: anytype, result: *BuildResult) !void {
+        for (self.children.items) |item| {
+            inline for (fields) |field| {
+                if (std.mem.eql(u8, field.name, item.name)) {
+                    var data = @intToPtr(*field.default_value.?, item.ptr);
+                    try data.render(result);
+                }
+            }
+        }
+    }
 
     pub fn render(self: *Grid, result: *BuildResult) !void {
         try result.add(MeshData{

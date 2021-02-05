@@ -13,30 +13,25 @@ var state = struct {
     name: []const u8 = "test"
 };
 
-pub const Element = struct {
-    tag: type,
-    link: usize,
-};
-
-pub fn buildElement(link: anytype) Element {
-    return Element{
-        .tag = @TypeOf(link),
-        .link = @ptrToInt(&link),
-    };
-}
-
 pub fn main() !void {
     var app = App.new(allocator);
     var result = BuildResult.new(allocator);
+
+    const elements = .{
+        .Rectangle = Rectangle,
+        .Text = Text,
+    };
 
     const rec = Rectangle.new(.{
         .width = 300,
         .height = 200,
     });
 
+    const fields = @typeInfo(@TypeOf(elements)).Struct.fields;
+
     const txt = Text.new(.{
-        .width = 300,
-        .height = 200,
+        .width = 10,
+        .height = 20,
         .text = "testing text",
     });
 
@@ -45,5 +40,11 @@ pub fn main() !void {
         .height = 200,
         .columns = 1,
         .rows = 3,
-    }, allocator);
+    }, allocator).child(rec).child(txt);
+
+    try grid.update(fields, &result);
+
+    for (result.vertices.items) |res| {
+        print(" vert  {} \n", .{res.position.x});
+    }
 }
