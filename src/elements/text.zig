@@ -26,7 +26,7 @@ pub const Text = struct {
         print("state {} \n", .{state.name});
     }
 
-    pub fn render(self: *Text, result: *BuildResult) !void {
+    pub fn render(self: *Text, comptime app: App, result: *BuildResult) !void {
         try result.add(MeshData{
             .vertices = &[_]Vertex{
                 Vertex{ .position = Vec3.new(self.x, self.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },

@@ -15,6 +15,7 @@ var state = .{ .name = "test" };
 const app = App.new(.{
     .Rectangle = Rectangle,
     .Text = Text,
+    .Grid = Grid,
 });
 
 pub fn main() !void {

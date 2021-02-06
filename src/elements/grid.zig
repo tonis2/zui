@@ -41,7 +41,7 @@ pub const Grid = struct {
         for (self.children.items) |item| {
             inline for (app.elements) |field| {
                 if (std.mem.eql(u8, field.name, item.name)) {
-                    try @intToPtr(*field.default_value.?, item.ptr).update(app, state);
+                    @intToPtr(*field.default_value.?, item.ptr).update(app, state) catch unreachable;
                 }
             }
         }
@@ -51,7 +51,7 @@ pub const Grid = struct {
         for (self.children.items) |item| {
             inline for (app.elements) |field| {
                 if (std.mem.eql(u8, field.name, item.name)) {
-                    try @intToPtr(*field.default_value.?, item.ptr).render(result);
+                    @intToPtr(*field.default_value.?, item.ptr).render(app, result) catch unreachable;
                 }
             }
         }

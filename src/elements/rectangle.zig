@@ -20,9 +20,9 @@ pub const Rectangle = struct {
         };
     }
 
-    pub fn update(self: *Rectangle,comptime app: App, state: anytype) !void {}
+    pub fn update(self: *Rectangle, comptime app: App, state: anytype) !void {}
 
-    pub fn render(self: *Rectangle, result: *BuildResult) !void {
+    pub fn render(self: *Rectangle, comptime app: App, result: *BuildResult) !void {
         try result.add(MeshData{
             .vertices = &[_]Vertex{
                 Vertex{ .position = Vec3.new(self.x, self.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
