@@ -1,4 +1,5 @@
 const std = @import("std");
+const App = @import("../app.zig").App;
 usingnamespace @import("../math.zig");
 
 const parseInt = std.fmt.parseInt;
@@ -19,7 +20,7 @@ pub const Rectangle = struct {
         };
     }
 
-    pub fn update(self: *Rectangle, state: anytype) !void {}
+    pub fn update(self: *Rectangle, app: *const App, state: anytype) !void {}
 
     pub fn render(self: *Rectangle, result: *BuildResult) !void {
         try result.add(MeshData{

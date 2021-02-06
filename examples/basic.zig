@@ -9,25 +9,23 @@ usingnamespace zui.Elements;
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = &gpa.allocator;
 
-var state = struct {
+const state = struct {
     name: []const u8 = "test"
 };
 
 pub fn main() !void {
-    var app = App.new(allocator);
-    var result = BuildResult.new(allocator);
-
     const elements = .{
         .Rectangle = Rectangle,
         .Text = Text,
     };
 
+    const app = App.new(elements);
+    var result = BuildResult.new(allocator);
+
     const rec = Rectangle.new(.{
         .width = 300,
         .height = 200,
     });
-
-    const fields = @typeInfo(@TypeOf(elements)).Struct.fields;
 
     const txt = Text.new(.{
         .width = 10,
@@ -40,9 +38,10 @@ pub fn main() !void {
         .height = 200,
         .columns = 1,
         .rows = 3,
-    }, allocator).child(rec).child(txt);
+    }, allocator).append(rec).append(txt);
 
-    try grid.update(fields, &result);
+    try grid.update(&app, &state);
+    try grid.render(&app, &result);
 
     for (result.vertices.items) |res| {
         print(" vert  {} \n", .{res.position.x});
