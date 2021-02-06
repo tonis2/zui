@@ -2,7 +2,7 @@ const zui = @import("zui");
 const std = @import("std");
 const print = std.debug.print;
 const App = zui.App;
-const ChildElement = zui.ChildElement;
+const Child = zui.Child;
 const BuildResult = zui.BuildResult;
 
 usingnamespace zui.Elements;
@@ -12,11 +12,12 @@ const allocator = &gpa.allocator;
 
 var state = .{ .name = "test" };
 
+const app = App.new(.{
+    .Rectangle = Rectangle,
+    .Text = Text,
+});
+
 pub fn main() !void {
-    const app = App.new(.{
-        .Rectangle = Rectangle,
-        .Text = Text,
-    });
     var result = BuildResult.new(allocator);
 
     const rec = Rectangle.new(.{
@@ -35,9 +36,9 @@ pub fn main() !void {
         .height = 200,
         .columns = 1,
         .rows = 3,
-    }, allocator).appendSlice(&[_]ChildElement{
-        ChildElement.from(rec),
-        ChildElement.from(txt),
+    }, allocator).appendSlice(&[_]Child{
+        Child.from(rec),
+        Child.from(txt),
     });
 
     try grid.update(app, &state);

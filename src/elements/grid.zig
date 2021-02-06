@@ -1,6 +1,6 @@
 const std = @import("std");
 const App = @import("../app.zig").App;
-const ChildElement = @import("../app.zig").ChildElement;
+const Child = @import("../app.zig").Child;
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 
@@ -13,7 +13,7 @@ pub const Grid = struct {
     y: u32,
     columns: u32,
     rows: u32,
-    children: std.ArrayList(ChildElement),
+    children: std.ArrayList(Child),
 
     pub fn new(data: struct { width: u32 = 0, height: u32 = 0, x: u32 = 0, y: u32 = 0, columns: u32, rows: u32 }, allocator: *Allocator) Grid {
         return Grid{
@@ -23,16 +23,16 @@ pub const Grid = struct {
             .y = data.y,
             .columns = data.columns,
             .rows = data.rows,
-            .children = std.ArrayList(ChildElement).init(allocator),
+            .children = std.ArrayList(Child).init(allocator),
         };
     }
 
     pub fn append(self: *Grid, element: anytype) *Grid {
-        self.children.append(ChildElement.from(element)) catch unreachable;
+        self.children.append(Child.from(element)) catch unreachable;
         return self;
     }
 
-    pub fn appendSlice(self: *Grid, elements: []const ChildElement) *Grid {
+    pub fn appendSlice(self: *Grid, elements: []const Child) *Grid {
         self.children.appendSlice(elements) catch unreachable;
         return self;
     }

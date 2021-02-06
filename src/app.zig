@@ -14,12 +14,12 @@ pub const App = struct {
     }
 };
 
-pub const ChildElement = struct {
+pub const Child = struct {
     name: []const u8,
     ptr: usize,
 
-    pub fn from(element: anytype) ChildElement {
-        return ChildElement{
+    pub fn from(element: anytype) Child {
+        return Child{
             .name = @typeName(@TypeOf(element)),
             .ptr = @ptrToInt(&element),
         };
