@@ -22,10 +22,11 @@ pub const Text = struct {
         };
     }
 
-    pub fn update(self: *Text, comptime app: *App, state: anytype) !void {}
+    pub fn update(self: *Text, comptime app: App, state: anytype) !void {
+        print("state {} \n", .{state.name});
+    }
 
     pub fn render(self: *Text, result: *BuildResult) !void {
-        print(" name {} \n", .{self.text});
         try result.add(MeshData{
             .vertices = &[_]Vertex{
                 Vertex{ .position = Vec3.new(self.x, self.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },

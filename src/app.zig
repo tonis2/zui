@@ -13,3 +13,15 @@ pub const App = struct {
         };
     }
 };
+
+pub const ChildElement = struct {
+    name: []const u8,
+    ptr: usize,
+
+    pub fn from(element: anytype) ChildElement {
+        return ChildElement{
+            .name = @typeName(@TypeOf(element)),
+            .ptr = @ptrToInt(&element),
+        };
+    }
+};

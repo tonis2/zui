@@ -20,7 +20,7 @@ pub const Rectangle = struct {
         };
     }
 
-    pub fn update(self: *Rectangle, app: *const App, state: anytype) !void {}
+    pub fn update(self: *Rectangle,comptime app: App, state: anytype) !void {}
 
     pub fn render(self: *Rectangle, result: *BuildResult) !void {
         try result.add(MeshData{
