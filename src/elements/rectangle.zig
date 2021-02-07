@@ -1,34 +1,26 @@
 const std = @import("std");
 const App = @import("../app.zig").App;
+const Style = @import("../style.zig").Style;
 usingnamespace @import("../math.zig");
 
-const parseInt = std.fmt.parseInt;
-const print = std.debug.print;
-
 pub const Rectangle = struct {
-    width: u32,
-    height: u32,
-    x: u32,
-    y: u32,
+    style: Style,
 
-    pub fn new(data: struct { width: u32 = 0, height: u32 = 0, x: u32 = 0, y: u32 = 0 }) Rectangle {
+    pub fn new(style: Style) Rectangle {
         return Rectangle{
-            .width = data.width,
-            .height = data.height,
-            .x = data.x,
-            .y = data.y,
+            .style = style,
         };
     }
-
+    pub fn init(self: *Rectangle, comptime app: App, state: anytype) !void {}
     pub fn update(self: *Rectangle, comptime app: App, state: anytype) !void {}
 
     pub fn render(self: *Rectangle, comptime app: App, result: *BuildResult) !void {
         try result.add(MeshData{
             .vertices = &[_]Vertex{
-                Vertex{ .position = Vec3.new(self.x, self.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
-                Vertex{ .position = Vec3.new(self.x + self.width, self.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
-                Vertex{ .position = Vec3.new(self.x + self.width, self.y + self.height, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
-                Vertex{ .position = Vec3.new(self.x, self.y + self.height, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
+                Vertex{ .position = Vec3.new(self.style.x, self.style.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
+                Vertex{ .position = Vec3.new(self.style.x + self.style.width, self.style.y, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
+                Vertex{ .position = Vec3.new(self.style.x + self.style.width, self.style.y + self.style.height, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
+                Vertex{ .position = Vec3.new(self.style.x, self.style.y + self.style.height, 0), .color = [4]u16{ 1.0, 1.0, 1.0, 1.0 } },
             },
             .indices = &[_]u16{ 0, 1, 2, 2, 3, 0 },
         });

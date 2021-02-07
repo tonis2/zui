@@ -3,6 +3,7 @@ const std = @import("std");
 const print = std.debug.print;
 const App = zui.App;
 const Child = zui.Child;
+const Style = zui.Style;
 const BuildResult = zui.BuildResult;
 
 usingnamespace zui.Elements;
@@ -21,31 +22,24 @@ const app = App.new(.{
 pub fn main() !void {
     var result = BuildResult.new(allocator);
 
-    const rec = Rectangle.new(.{
-        .width = 300,
-        .height = 200,
-    });
+    var grid = Grid.new(.{
+        .style = .{ .width = 300, .height = 300 },
+        .rows = .{ .auto = true, .gap = 5 },
+        .columns = .{ .count = 3 },
+    }, allocator);
 
-    const txt = Text.new(.{
-        .width = 10,
-        .height = 20,
-        .text = "testing text",
-    });
-
-    const grid = Grid.new(.{
-        .width = 300,
-        .height = 200,
-        .columns = 1,
-        .rows = 3,
-    }, allocator).appendSlice(&[_]Child{
-        Child.from(rec),
-        Child.from(txt),
-    });
+    _ = grid.appendSlice(&[_]Grid.Child{Grid.Child.from(Rectangle.new(.{ .width = 300, .height = 300 }))});
 
     try grid.update(app, &state);
     try grid.render(app, &result);
 
     for (result.vertices.items) |res| {
         print(" vert  {} \n", .{res.position.x});
+    }
+
+    defer {
+        result.deinit();
+        grid.deinit();
+        _ = gpa.deinit();
     }
 }

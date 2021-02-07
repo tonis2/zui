@@ -1,28 +1,41 @@
 const std = @import("std");
 const App = @import("../app.zig").App;
-const Child = @import("../app.zig").Child;
+
+const Style = @import("../style.zig").Style;
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 
 usingnamespace @import("../math.zig");
 
+pub const Detail = struct {
+    auto: bool = false,
+    count: u16 = 1,
+    gap: u16 = 0,
+};
+
 pub const Grid = struct {
-    width: u32,
-    height: u32,
-    x: u32,
-    y: u32,
-    columns: u32,
-    rows: u32,
+    style: Style,
+    rows: Detail,
+    columns: Detail,
     children: std.ArrayList(Child),
 
-    pub fn new(data: struct { width: u32 = 0, height: u32 = 0, x: u32 = 0, y: u32 = 0, columns: u32, rows: u32 }, allocator: *Allocator) Grid {
+    pub const Child = struct {
+        name: []const u8,
+        ptr: usize,
+
+        pub fn from(element: anytype) Child {
+            return Child{
+                .name = @typeName(@TypeOf(element)),
+                .ptr = @ptrToInt(&element),
+            };
+        }
+    };
+
+    pub fn new(config: struct { style: Style, rows: Detail, columns: Detail }, allocator: *Allocator) Grid {
         return Grid{
-            .width = data.width,
-            .height = data.height,
-            .x = data.x,
-            .y = data.y,
-            .columns = data.columns,
-            .rows = data.rows,
+            .style = config.style,
+            .columns = config.columns,
+            .rows = config.rows,
             .children = std.ArrayList(Child).init(allocator),
         };
     }
@@ -37,6 +50,7 @@ pub const Grid = struct {
         return self;
     }
 
+    pub fn init(self: *Grid, comptime app: App, state: anytype) !void {}
     pub fn update(self: *Grid, comptime app: App, state: anytype) !void {
         for (self.children.items) |item| {
             inline for (app.elements) |field| {
@@ -55,5 +69,9 @@ pub const Grid = struct {
                 }
             }
         }
+    }
+
+    pub fn deinit(self: *Grid) void {
+        self.children.deinit();
     }
 };
