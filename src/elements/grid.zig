@@ -1,6 +1,6 @@
 const std = @import("std");
 const App = @import("../app.zig").App;
-
+const BuildResult = @import("../app.zig").BuildResult;
 const Style = @import("../style.zig").Style;
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;

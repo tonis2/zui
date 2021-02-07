@@ -34,7 +34,7 @@ pub fn main() !void {
     try grid.render(app, &result);
 
     for (result.vertices.items) |res| {
-        print(" vert  {} \n", .{res.position.x});
+        print(" vert  {} \n", .{res.position[0]});
     }
 
     defer {

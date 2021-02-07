@@ -4,8 +4,8 @@ pub const Color = struct {
     b: u8 = 1.0,
     a: u8 = 1.0,
 
-    pub fn value(self: *Color) 4[u8] {
-        return 4[u8]{ self.r, self.g, self.b, self.a };
+    pub fn value(self: *Color) [4]u8 {
+        return [4]u8{ self.r, self.g, self.b, self.a };
     }
 };
 
