@@ -16,11 +16,15 @@ pub const Rectangle = struct {
     pub fn update(self: *Rectangle, comptime app: App, state: anytype) !void {}
 
     pub fn render(self: *Rectangle, comptime app: App, result: *BuildResult) !void {
-        try result.add(Primitives.Rectangle.new(.{
-            .width = self.style.width,
-            .height = self.style.height,
-            .x = self.style.x,
-            .y = self.style.y,
-        }, self.style.background.value()));
+        try Primitives.Rectangle.build(
+            .{
+                .width = self.style.width,
+                .height = self.style.height,
+                .x = self.style.x,
+                .y = self.style.y,
+            },
+            self.style.background.value(),
+            result,
+        );
     }
 };

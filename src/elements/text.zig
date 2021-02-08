@@ -22,11 +22,15 @@ pub const Text = struct {
     }
 
     pub fn render(self: *Text, comptime app: App, result: *BuildResult) !void {
-        try result.add(Primitives.Rectangle.new(.{
-            .width = self.style.width,
-            .height = self.style.height,
-            .x = self.style.x,
-            .y = self.style.y,
-        }, self.style.background.value()));
+        try Primitives.Rectangle.build(
+            .{
+                .width = self.style.width,
+                .height = self.style.height,
+                .x = self.style.x,
+                .y = self.style.y,
+            },
+            self.style.background.value(),
+            result,
+        );
     }
 };
