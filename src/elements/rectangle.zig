@@ -2,7 +2,7 @@ const std = @import("std");
 const App = @import("../app.zig").App;
 const Style = @import("../style.zig").Style;
 const BuildResult = @import("../app.zig").BuildResult;
-const Primitives = @import("../primitives.zig");
+const Vertex = @import("../math.zig").Vertex;
 
 pub const Rectangle = struct {
     style: Style,
@@ -16,15 +16,16 @@ pub const Rectangle = struct {
     pub fn update(self: *Rectangle, comptime app: App, state: anytype) !void {}
 
     pub fn render(self: *Rectangle, comptime app: App, result: *BuildResult) !void {
-        try Primitives.Rectangle.build(
+        try result.add(
             .{
-                .width = self.style.width,
-                .height = self.style.height,
-                .x = self.style.x,
-                .y = self.style.y,
-            },
-            self.style.background.value(),
-            result,
+                .vertices = &[_]Vertex{
+                    Vertex{ .position = [3]u32{ self.style.x, self.style.y, self.style.z }, .color = self.style.background.value() },
+                    Vertex{ .position = [3]u32{ self.style.x + self.style.width, self.style.y, self.style.z }, .color = self.style.background.value() },
+                    Vertex{ .position = [3]u32{ self.style.x + self.style.width, self.style.y + self.style.height, self.style.z }, .color = self.style.background.value() },
+                    Vertex{ .position = [3]u32{ self.style.x, self.style.y + self.style.height, self.style.z }, .color = self.style.background.value() },
+                },
+                .indices = &[_]u16{ 0, 1, 2, 2, 3, 0 },
+            }
         );
     }
 };

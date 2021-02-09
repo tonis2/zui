@@ -14,6 +14,7 @@ pub const Style = struct {
     height: u16 = 100.0,
     x: u16 = 10.0,
     y: u16 = 10.0,
+    z: u16 = 0,
     background: Color = Color{},
     text_color: Color = Color{},
 };
