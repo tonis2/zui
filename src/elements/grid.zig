@@ -7,16 +7,9 @@ const print = std.debug.print;
 
 usingnamespace @import("../math.zig");
 
-pub const Detail = struct {
-    auto: bool = false,
-    count: u16 = 1,
-    gap: u16 = 0,
-};
 
 pub const Grid = struct {
     style: Style,
-    rows: Detail,
-    columns: Detail,
     children: std.ArrayList(Child),
 
     pub const Child = struct {
@@ -31,11 +24,9 @@ pub const Grid = struct {
         }
     };
 
-    pub fn new(config: struct { style: Style, rows: Detail, columns: Detail }, allocator: *Allocator) Grid {
+    pub fn new(style: Style, allocator: *Allocator) Grid {
         return Grid{
-            .style = config.style,
-            .columns = config.columns,
-            .rows = config.rows,
+            .style = style,
             .children = std.ArrayList(Child).init(allocator),
         };
     }

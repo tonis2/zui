@@ -25,9 +25,8 @@ pub fn main() !void {
     var result = BuildResult.new(allocator);
 
     var grid = Grid.new(.{
-        .style = .{ .width = 300, .height = 300 },
-        .rows = .{ .auto = true, .gap = 5 },
-        .columns = .{ .count = 3 },
+        .width = 300,
+        .height = 300,
     }, allocator);
 
     _ = grid.appendSlice(&[_]Child{Child.from(Rectangle{ .style = .{ .width = 300, .height = 300 } })});
