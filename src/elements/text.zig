@@ -18,7 +18,7 @@ pub const Text = struct {
 
     pub fn init(self: *Text, comptime app: App, state: anytype) !void {}
     pub fn update(self: *Text, comptime app: App, state: anytype) !void {
-        print("state {} \n", .{state.name});
+       
     }
 
     pub fn render(self: *Text, comptime app: App, result: *BuildResult) !void {
