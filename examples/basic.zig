@@ -1,5 +1,6 @@
 const zui = @import("zui");
 const std = @import("std");
+const vulkan = @import("vulkan");
 const print = std.debug.print;
 const App = zui.App;
 
@@ -37,6 +38,8 @@ pub fn main() !void {
     for (result.vertices.items) |res| {
         print(" vert  {d} \n", .{res.position[0]});
     }
+
+    try vulkan.run();
 
     defer {
         result.deinit();
