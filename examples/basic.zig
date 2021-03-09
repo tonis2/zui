@@ -1,6 +1,6 @@
 const zui = @import("zui");
 const std = @import("std");
-const vulkan = @import("vulkan");
+const vulkan = @import("vulkan-backend");
 const print = std.debug.print;
 const App = zui.App;
 
