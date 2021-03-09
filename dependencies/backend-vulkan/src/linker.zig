@@ -4,6 +4,8 @@ const Builder = std.build.Builder;
 const LibExeObjStep = std.build.LibExeObjStep;
 const Pkg = std.build.Pkg;
 
+const print = std.debug.print;
+
 const vkgen = @import("../dependencies/vulkan-zig/generator/index.zig");
 const ResourceGenStep = @import("../dependencies/vulkan-zig/build.zig").ResourceGenStep;
 
@@ -27,18 +29,15 @@ pub fn attachTo(exe: *LibExeObjStep) void {
 
     exe.step.dependOn(&gen.step);
     exe.step.dependOn(&shaders.step);
-
+    const vulkan_package = Pkg{
+        .name = "vulkan",
+        .path = gen.package.path,
+    };
     exe.addPackage(
         .{ .name = "vulkan-backend", .path = "dependencies/backend-vulkan/src/vulkan.zig", .dependencies = &[_]Pkg{
-            .{
-                .name = "graphics_context",
-                .path = "dependencies/backend-vulkan/dependencies/vulkan-zig/examples/graphics_context.zig",
-            },
-            .{
-                .name = "c",
-                .path = "dependencies/backend-vulkan/dependencies/vulkan-zig/examples/c.zig",
-            },
-            gen.package,
+            .{ .name = "graphics_context", .path = "dependencies/backend-vulkan/dependencies/vulkan-zig/examples/graphics_context.zig", .dependencies = &[_]Pkg{vulkan_package} },
+            .{ .name = "c", .path = "dependencies/backend-vulkan/dependencies/vulkan-zig/examples/c.zig", .dependencies = &[_]Pkg{vulkan_package} },
+            vulkan_package,
             shaders.package,
         } },
     );
