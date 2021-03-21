@@ -20,6 +20,6 @@ pub const Style = struct {
     columns: u32 = 0,
     column: u32 = 0,
     row: u32 = 0,
-    background: Color = Color{},
-    textColor: Color = Color{},
+    material: Color = Color{},
+    textMaterial: Color = Color{}
 };

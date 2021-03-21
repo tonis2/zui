@@ -1,12 +1,11 @@
 const std = @import("std");
-const App = @import("../app.zig").App;
-const BuildResult = @import("../app.zig").BuildResult;
+
 const Style = @import("../style.zig").Style;
+const callElements = @import("./meta.zig").callElements;
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 
 usingnamespace @import("../math.zig");
-
 
 pub const Grid = struct {
     style: Style,
@@ -31,35 +30,22 @@ pub const Grid = struct {
         };
     }
 
-    pub fn append(self: *Grid, element: anytype) *Grid {
-        self.children.append(Child.from(element)) catch unreachable;
+    pub fn append(self: *Grid, child: anytype) *Grid {
+        self.children.append(Child.from(child)) catch unreachable;
         return self;
     }
 
-    pub fn appendSlice(self: *Grid, elements: []const Child) *Grid {
-        self.children.appendSlice(elements) catch unreachable;
+    pub fn appendSlice(self: *Grid, children: []const Child) *Grid {
+        self.children.appendSlice(children) catch unreachable;
         return self;
     }
 
-    pub fn init(self: *Grid, comptime app: App, state: anytype) !void {}
-    pub fn update(self: *Grid, comptime app: App, state: anytype) !void {
-        for (self.children.items) |item| {
-            inline for (app.elements) |field| {
-                if (std.mem.eql(u8, field.name, item.name)) {
-                    @intToPtr(*field.default_value.?, item.ptr).update(app, state) catch unreachable;
-                }
-            }
-        }
+    pub fn update(self: *Grid, state: anytype) !void {
+        callElements(self.children.items, "update", state) catch unreachable;
     }
 
-    pub fn render(self: *Grid, comptime app: App, result: *BuildResult) !void {
-        for (self.children.items) |item| {
-            inline for (app.elements) |field| {
-                if (std.mem.eql(u8, field.name, item.name)) {
-                    @intToPtr(*field.default_value.?, item.ptr).render(app, result) catch unreachable;
-                }
-            }
-        }
+    pub fn render(self: *Grid, result: *BuildResult) !void {
+        callElements(self.children.items, "render", state) catch unreachable;
     }
 
     pub fn deinit(self: *Grid) void {

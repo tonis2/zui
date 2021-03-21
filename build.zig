@@ -3,7 +3,7 @@ const fmt = std.fmt;
 const std = @import("std");
 const print = std.debug.print;
 
-const vulkan = @import("/dependencies/backend-vulkan/src/linker.zig");
+// const vulkan = @import("/dependencies/backend-vulkan/src/linker.zig");
 
 pub fn build(b: *Builder) !void {
     const target = b.standardTargetOptions(.{});
@@ -20,13 +20,12 @@ pub fn build(b: *Builder) !void {
 
         exe.setTarget(target);
         exe.setBuildMode(mode);
+        const Pkg = std.build.Pkg;
+        const zui = Pkg{ .name = "zui", .path = "src/zui.zig", .dependencies = &[_]Pkg{.{ .name = "elements", .path = "examples/elements.zig" }} };
 
-        exe.addPackage(.{
-            .name = "zui",
-            .path = "src/zui.zig",
-        });
+        exe.addPackage(zui);
 
-        vulkan.attachTo(exe);
+        // vulkan.attachTo(exe);
 
         exe.install();
 
