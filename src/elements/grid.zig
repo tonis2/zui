@@ -1,7 +1,7 @@
 const std = @import("std");
 
 const Style = @import("../style.zig").Style;
-const callElements = @import("./meta.zig").callElements;
+const callElements = @import("../meta.zig").callElements;
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 
