@@ -18,17 +18,16 @@ var state = .{ .name = "state" };
 fn changeState() void {}
 
 pub fn main() !void {
+    defer std.debug.assert(!gpa.deinit());
+    
     var grid = Grid.new(.{
         .width = 300,
         .height = 300,
     }, allocator);
 
+    defer grid.deinit();
+
     grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 } });
     grid.append(Text{ .text = "test2", .style = .{ .width = 300, .height = 300 } });
     grid.update(&state);
-
-    defer {
-        grid.deinit();
-        _ = gpa.deinit();
-    }
 }
