@@ -21,7 +21,7 @@ pub fn build(b: *Builder) !void {
         exe.setTarget(target);
         exe.setBuildMode(mode);
         const Pkg = std.build.Pkg;
-        const zui = Pkg{ .name = "zui", .path = "src/zui.zig", .dependencies = &[_]Pkg{.{ .name = "elements", .path = "examples/elements.zig" }} };
+        const zui = Pkg{ .name = "zui", .path = std.build.FileSource{ .path = "src/zui.zig" } };
 
         exe.addPackage(zui);
 

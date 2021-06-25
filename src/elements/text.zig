@@ -14,9 +14,9 @@ pub const Text = struct {
         };
     }
 
-    pub fn update(self: *Text, state: anytype) !void {
+    pub fn update(self: *Text, state: anytype) void {
         print(" {s} \n", .{state.name});
         print(" {s} \n", .{self.text});
     }
-    pub fn render(self: *Text, result: *BuildResult) !void {}
+    pub fn render(self: *Text, result: *BuildResult) void {}
 };
