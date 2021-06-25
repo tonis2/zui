@@ -13,7 +13,7 @@ pub const CustomElements = .{
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = &gpa.allocator;
 
-var state = .{ .name = "test" };
+var state = .{ .name = "state" };
 
 fn changeState() void {}
 
@@ -23,8 +23,8 @@ pub fn main() !void {
         .height = 300,
     }, allocator);
 
-    grid.append(Text{ .text = "xt1", .style = .{ .width = 300, .height = 300 } });
-
+    grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 } });
+    grid.append(Text{ .text = "test2", .style = .{ .width = 300, .height = 300 } });
     grid.update(&state);
 
     defer {
