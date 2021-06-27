@@ -3,13 +3,9 @@ const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 const TypeInfo = std.builtin.TypeInfo;
 
-pub const MeshData = struct {
-    indices: []const u16, vertices: []const Vertex
-};
+pub const MeshData = struct { indices: []const u16, vertices: []const Vertex };
 
-pub const Vertex = struct {
-    position: [3]u32, color: [4]u8
-};
+pub const Vertex = struct { position: [3]u32, color: [4]u8 };
 
 pub const DrawBuffer = struct {
     vertices: std.ArrayList(Vertex),
@@ -43,17 +39,6 @@ pub const DrawBuffer = struct {
         }
     }
 
-    pub fn drawPrimitive(self: *DrawBuffer, primitive: anytype) !void {
-        for (primitive.vertices) |vert| {
-            try self.vertices.append(vert);
-        }
-        // try self.vertices.appendSlice(primitive.vertices[0..]);
-
-        // for (primitive.indices) |value| {
-        //     try self.indices.append(value + @intCast(u16, self.indices.items.len));
-        // }
-    }
-
     pub fn clear(self: *DrawBuffer) void {
         self.vertices.shrink(0);
         self.indices.shrink(0);
@@ -63,10 +48,4 @@ pub const DrawBuffer = struct {
         self.vertices.deinit();
         self.indices.deinit();
     }
-};
-
-const DrawCommand = struct {
-    vertices: []const Vertex,
-    indices: []const u16,
-    shader: []const u8,
 };

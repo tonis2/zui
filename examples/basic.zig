@@ -14,9 +14,18 @@ pub const CustomElements = .{
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = &gpa.allocator;
 
-var state = .{ .name = "state" };
+const State = struct {
+    name: []const u8,
+};
 
-fn changeState() void {}
+var state = State{ .name = "hello" };
+
+var App: zui.App = .{ .state = state, .width = 200.0, .height = 200.0 };
+
+fn changeState(self: *Text) void {
+    self.text = "test3";
+    std.debug.print("{s} \n", .{"sss"});
+}
 
 pub fn main() !void {
     defer std.debug.assert(!gpa.deinit());
@@ -31,7 +40,7 @@ pub fn main() !void {
 
     defer grid.deinit();
 
-    grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 } });
+    grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 }, .click = changeState });
     grid.append(Text{ .text = "test2", .style = .{ .width = 300, .height = 300 } });
     grid.update(&state);
     grid.render(&result);

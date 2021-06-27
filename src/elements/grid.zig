@@ -1,13 +1,12 @@
 const std = @import("std");
 
-const Style = @import("../style.zig").Style;
+const Style = @import("../style.zig");
 const DrawBuffer = @import("../drawing.zig").DrawBuffer;
 const root = @import("root");
 const callEach = @import("../meta.zig").callEach;
 
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
-
 
 pub const Child = struct {
     name: []const u8,

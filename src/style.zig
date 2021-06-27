@@ -9,17 +9,15 @@ pub const Color = struct {
     }
 };
 
-pub const Style = struct {
-    width: u16 = 100.0,
-    height: u16 = 100.0,
-    x: u16 = 10.0,
-    y: u16 = 10.0,
-    z: u16 = 0,
-    gap: [2]u16 = [_]u16{ 0.0, 0.0 },
-    rows: u32 = 0,
-    columns: u32 = 0,
-    column: u32 = 0,
-    row: u32 = 0,
-    material: Color = Color{},
-    textMaterial: Color = Color{}
-};
+width: f32 = 100.0,
+height: f32 = 100.0,
+x: f32 = 10.0,
+y: f32 = 10.0,
+z: f32 = 0,
+gap: [2]f16 = [_]f16{ 0.0, 0.0 },
+rows: u32 = 0,
+columns: u32 = 0,
+column: u32 = 0,
+row: u32 = 0,
+material: Color = Color{},
+textMaterial: Color = Color{},
