@@ -1,14 +1,13 @@
 const std = @import("std");
 
 const Style = @import("../style.zig").Style;
-
+const DrawBuffer = @import("../drawing.zig").DrawBuffer;
 const root = @import("root");
 const callEach = @import("../meta.zig").callEach;
 
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 
-usingnamespace @import("../math.zig");
 
 pub const Child = struct {
     name: []const u8,
@@ -46,8 +45,8 @@ pub const Grid = struct {
         callEach(self.children.items, "update", state);
     }
 
-    pub fn render(self: *Grid, result: *BuildResult) void {
-        callEach(self.children.items, "render", state);
+    pub fn render(self: *Grid, result: *DrawBuffer) void {
+        callEach(self.children.items, "render", result);
     }
 
     pub fn deinit(self: *Grid) void {

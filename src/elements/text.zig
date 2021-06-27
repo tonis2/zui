@@ -1,6 +1,7 @@
 const std = @import("std");
 const Vertex = @import("../math.zig").Vertex;
 const Style = @import("../style.zig").Style;
+const DrawBuffer = @import("../drawing.zig").DrawBuffer;
 const print = std.debug.print;
 
 pub const Text = struct {
@@ -18,5 +19,8 @@ pub const Text = struct {
         print(" {s} \n", .{state.name});
         print(" {s} \n", .{self.text});
     }
-    pub fn render(self: *Text, result: *BuildResult) void {}
+
+    pub fn render(self: *Text, result: *DrawBuffer) void {
+        result.drawRectangle(0, 100, 300, 300, .{ 1.0, 1.0, 1.0, 1.0 }) catch {};
+    }
 };

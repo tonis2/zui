@@ -1,6 +1,7 @@
 const zui = @import("zui");
 const std = @import("std");
 const print = std.debug.print;
+const DrawBuffer = zui.DrawBuffer;
 const Style = zui.Style;
 
 usingnamespace @import("zui").Elements;
@@ -19,7 +20,10 @@ fn changeState() void {}
 
 pub fn main() !void {
     defer std.debug.assert(!gpa.deinit());
-    
+
+    var result = DrawBuffer.new(allocator);
+    defer result.deinit();
+
     var grid = Grid.new(.{
         .width = 300,
         .height = 300,
@@ -30,4 +34,7 @@ pub fn main() !void {
     grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 } });
     grid.append(Text{ .text = "test2", .style = .{ .width = 300, .height = 300 } });
     grid.update(&state);
+    grid.render(&result);
+
+    std.debug.print("{d} \n", .{result.vertices.items});
 }
