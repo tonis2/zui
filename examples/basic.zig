@@ -3,13 +3,11 @@ const std = @import("std");
 const print = std.debug.print;
 const DrawBuffer = zui.DrawBuffer;
 const Style = zui.Style;
+const Element = zui.Element;
 
 usingnamespace @import("zui").Elements;
 
-pub const CustomElements = .{
-    .Text = Text,
-    .Grid = Grid,
-};
+pub const CustomElements = [2]Element{ Element.new("text", Text), Element.new("grid", Grid) };
 
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = &gpa.allocator;
@@ -18,13 +16,11 @@ const State = struct {
     name: []const u8,
 };
 
-var state = State{ .name = "hello" };
-
-var App: zui.App = .{ .state = state, .width = 200.0, .height = 200.0 };
+var App: zui.App(State) = .{ .state = .{ .name = "test" }, .width = 200.0, .height = 200.0 };
 
 fn changeState(self: *Text) void {
-    self.text = "test3";
-    std.debug.print("{s} \n", .{"sss"});
+    self.text = "test updated";
+    std.debug.print("{d} \n", .{App.width});
 }
 
 pub fn main() !void {
@@ -38,12 +34,20 @@ pub fn main() !void {
         .height = 300,
     }, allocator);
 
+    var grid2 = Grid.new(.{
+        .width = 600,
+        .height = 600,
+    }, allocator);
+
     defer grid.deinit();
+    defer grid2.deinit();
 
-    grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 }, .click = changeState });
-    grid.append(Text{ .text = "test2", .style = .{ .width = 300, .height = 300 } });
-    grid.update(&state);
-    grid.render(&result);
+    grid2.append(Text{ .text = "test3", .style = .{ .width = 300, .height = 300 } });
+    grid.append(grid2);
 
-    std.debug.print("{d} \n", .{result.vertices.items});
+    grid.append(Text{ .text = "test2", .style = .{ .width = 300, .height = 300 }, .click = changeState });
+    grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 } });
+
+    grid.update(&App);
+    // grid.render(&result);
 }
