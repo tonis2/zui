@@ -1,10 +1,11 @@
 const std = @import("std");
 const vk = @import("vulkan");
 const c = @import("c");
+const Allocator = std.mem.Allocator;
 const resources = @import("resources");
 const GraphicsContext = @import("graphics_context").GraphicsContext;
 const Swapchain = @import("swapchain.zig").Swapchain;
-const Allocator = std.mem.Allocator;
+
 
 const app_name = "vulkan-zig triangle example";
 

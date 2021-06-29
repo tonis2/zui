@@ -2,7 +2,6 @@ const zui = @import("zui");
 const std = @import("std");
 const print = std.debug.print;
 const DrawBuffer = zui.DrawBuffer;
-const Style = zui.Style;
 const Element = zui.Element;
 
 usingnamespace @import("zui").Elements;
@@ -49,5 +48,5 @@ pub fn main() !void {
     grid.append(Text{ .text = "test1", .style = .{ .width = 300, .height = 300 } });
 
     grid.update(&App);
-    // grid.render(&result);
+    grid.render(&result);
 }
