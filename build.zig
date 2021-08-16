@@ -1,9 +1,8 @@
 const Builder = @import("std").build.Builder;
 const fmt = std.fmt;
 const std = @import("std");
+const Pkg = std.build.Pkg;
 const print = std.debug.print;
-
-// const vulkan = @import("/dependencies/backend-vulkan/src/linker.zig");
 
 pub fn build(b: *Builder) !void {
     const target = b.standardTargetOptions(.{});
@@ -13,6 +12,9 @@ pub fn build(b: *Builder) !void {
         .{ "basic", "examples/basic.zig" },
     };
 
+    const zui = Pkg{ .name = "zui", .path = std.build.FileSource{ .path = "src/zui.zig" } };
+    const vulkan = Pkg{ .name = "vulkan", .path = std.build.FileSource{ .path = "dependencies/vulkan-experiment/src/vulkan.zig" } };
+
     for (examples) |example| {
         const name = example[0];
         const path = example[1];
@@ -20,12 +22,13 @@ pub fn build(b: *Builder) !void {
 
         exe.setTarget(target);
         exe.setBuildMode(mode);
-        const Pkg = std.build.Pkg;
-        const zui = Pkg{ .name = "zui", .path = std.build.FileSource{ .path = "src/zui.zig" } };
 
         exe.addPackage(zui);
+        exe.addPackage(vulkan);
 
-        // vulkan.attachTo(exe);
+        exe.linkLibC();
+        exe.linkSystemLibrary("glfw");
+        exe.linkSystemLibrary("vulkan");
 
         exe.install();
 

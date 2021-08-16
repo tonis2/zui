@@ -1,26 +1,28 @@
 const std = @import("std");
-const Vertex = @import("../math.zig").Vertex;
-const Style = @import("../style.zig");
+const Layout = @import("../layout.zig");
 const DrawBuffer = @import("../drawing.zig").DrawBuffer;
+usingnamespace @import("../meta.zig");
 const print = std.debug.print;
 
 const Self = @This();
 
-style: Style,
+layout: Layout,
 text: []const u8,
 click: ?fn (self: *Self) void = null,
 
-pub fn new(style: Style, text: []const u8) Self {
+pub fn new(layout: Layout, text: []const u8) Self {
     return Self{
-        .style = style,
+        .layout = layout,
         .text = text,
     };
 }
 
 pub fn update(self: *Self, app: anytype) void {
+    _ = app;
     print(" {s} \n", .{self.text});
 }
 
 pub fn render(self: *Self, result: *DrawBuffer) void {
-    result.drawRectangle(0, 100, 300, 300, .{ 1.0, 1.0, 1.0, 1.0 }) catch {};
+    _ = self;
+    result.drawRectangle(0, 100, 300, 300, Vec4.new(1.0, 1.0, 1.0, 1.0)) catch {};
 }

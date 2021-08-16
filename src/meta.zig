@@ -14,6 +14,7 @@ pub fn callEach(list: anytype, comptime command: []const u8, payload: anytype) v
                 break :brk;
             }
         };
+        _ = b;
     }
 }
 
@@ -29,6 +30,37 @@ pub const Element = struct {
     }
 };
 
+pub const Vertex = struct { position: Vec3, color: Vec4 };
+pub const Vec2 = struct {
+    x: f32,
+    y: f32,
+
+    pub fn new(x: f32, y: f32) Vec2 {
+        return Vec2{
+            .x = x,
+            .y = y,
+        };
+    }
+};
+pub const Vec3 = struct {
+    x: f32,
+    y: f32,
+    z: f32,
+
+    pub fn new(x: f32, y: f32, z: f32) Vec3 {
+        return Vec3{ .x = x, .y = y, .z = z };
+    }
+};
+pub const Vec4 = struct {
+    x: f32,
+    y: f32,
+    z: f32,
+    w: f32,
+
+    pub fn new(x: f32, y: f32, z: f32, w: f32) Vec4 {
+        return Vec4{ .x = x, .y = y, .z = z, .w = w };
+    }
+};
 
 // Has click event
 //         if (@hasField(element.default_value.?, "click")) {

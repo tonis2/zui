@@ -1,9 +1,10 @@
-pub const Math = @import("./math.zig");
 pub const Elements = @import("./elements/index.zig");
 pub const Drawing = @import("./drawing.zig");
-
-pub const Style = @import("./style.zig");
-pub const Color = @import("./style.zig").Color;
-pub const DrawBuffer = Drawing.DrawBuffer;
 pub const App = @import("./app.zig").App;
-pub const Element = @import("./meta.zig").Element;
+pub const Meta = @import("./meta.zig");
+
+pub const Layout = @import("./layout.zig");
+pub const Color = Layout.Color;
+pub const DrawBuffer = Drawing.DrawBuffer;
+pub const Element = Meta.Element;
+

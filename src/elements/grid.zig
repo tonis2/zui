@@ -1,8 +1,8 @@
 const std = @import("std");
-
-const Style = @import("../style.zig");
-const DrawBuffer = @import("../drawing.zig").DrawBuffer;
 const root = @import("root");
+
+const Layout = @import("../layout.zig");
+const DrawBuffer = @import("../drawing.zig").DrawBuffer;
 const callEach = @import("../meta.zig").callEach;
 
 const Allocator = std.mem.Allocator;
@@ -22,12 +22,12 @@ pub const Child = struct {
     }
 };
 
-style: Style,
+layout: Layout,
 children: std.ArrayList(Child),
 
-pub fn new(style: Style, allocator: *Allocator) Self {
+pub fn new(layout: Layout, allocator: *Allocator) Self {
     return Self{
-        .style = style,
+        .layout = layout,
         .children = std.ArrayList(Child).init(allocator),
     };
 }
