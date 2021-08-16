@@ -1,0 +1,3 @@
+[submodule "dependencies/vulkan-experiment"]
+	path = dependencies/vulkan-experiment
+	url = https://github.com/tonis2/vulkan-experiment
