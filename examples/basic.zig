@@ -30,14 +30,14 @@ const State = struct {
 
 var App: zui.App(State) = .{ .state = .{ .name = "test" }, .width = 200.0, .height = 200.0 };
 
-// const vertices = [_]Vertex{
-//     Vertex{ .position = Vec3.new(-0.5, -0.5, 1.0), .color = Vec4.new(1.0, 0.0, 0.0, 1.0) },
-//     Vertex{ .position = Vec3.new(0.5, -0.5, 1.0), .color = Vec4.new(0.0, 1.0, 0.0, 1.0) },
-//     Vertex{ .position = Vec3.new(0.5, 0.5, 1.0), .color = Vec4.new(0.0, 0.0, 1.0, 1.0) },
-//     Vertex{ .position = Vec3.new(-0.5, 0.5, 1.0), .color = Vec4.new(1.0, 1.0, 1.0, 1.0) },
-// };
+const vertices = [_]Vertex{
+    Vertex{ .position = Vec3.new(-0.5, -0.5, 1.0), .color = Vec4.new(1.0, 0.0, 0.0, 1.0) },
+    Vertex{ .position = Vec3.new(0.5, -0.5, 1.0), .color = Vec4.new(0.0, 1.0, 0.0, 1.0) },
+    Vertex{ .position = Vec3.new(0.5, 0.5, 1.0), .color = Vec4.new(0.0, 0.0, 1.0, 1.0) },
+    Vertex{ .position = Vec3.new(-0.5, 0.5, 1.0), .color = Vec4.new(1.0, 1.0, 1.0, 1.0) },
+};
 
-// const v_indices = [_]u16{ 0, 1, 2, 2, 3, 0 };
+const v_indices = [_]u16{ 0, 1, 2, 2, 3, 0 };
 
 fn changeState(self: *Text) void {
     self.text = "test updated";
@@ -64,8 +64,8 @@ pub fn main() !void {
     const renderpass = try Renderpass.init(context);
     const pipeline = try Pipeline.init(context, renderpass.renderpass);
 
-    const vertex_buffer = try Buffer(Vertex, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT).init(context, result.vertices.items[0..]);
-    const index_buffer = try Buffer(u16, VK_BUFFER_USAGE_INDEX_BUFFER_BIT).init(context, result.indices.items[0..]);
+    const vertex_buffer = try Buffer(Vertex, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT).init(context, &vertices);
+    const index_buffer = try Buffer(u16, VK_BUFFER_USAGE_INDEX_BUFFER_BIT).init(context, &v_indices);
 
     defer {
         vertex_buffer.deinit(context);
