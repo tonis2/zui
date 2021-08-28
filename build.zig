@@ -12,8 +12,9 @@ pub fn build(b: *Builder) !void {
         .{ "basic", "examples/basic.zig" },
     };
 
-    const zui = Pkg{ .name = "zui", .path = std.build.FileSource{ .path = "src/zui.zig" } };
     const vulkan = Pkg{ .name = "vulkan", .path = std.build.FileSource{ .path = "dependencies/vulkan-experiment/src/vulkan.zig" } };
+    const zalgebra = Pkg{ .name = "zalgebra", .path = std.build.FileSource{ .path = "dependencies/zalgebra/src/main.zig" } };
+    const zui = Pkg{ .name = "zui", .path = std.build.FileSource{ .path = "src/zui.zig" }, .dependencies = &[_]Pkg{zalgebra} };
 
     for (examples) |example| {
         const name = example[0];
@@ -25,6 +26,7 @@ pub fn build(b: *Builder) !void {
 
         exe.addPackage(zui);
         exe.addPackage(vulkan);
+        exe.addPackage(zalgebra);
 
         exe.linkLibC();
         exe.linkSystemLibrary("glfw");

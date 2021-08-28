@@ -1,25 +1,108 @@
+const std = @import("std");
 const Vulkan = @import("vulkan");
-const zui = @import("zui");
+const Camera = @import("camera.zig");
 
-const Context = Vulkan.Context;
+usingnamespace @import("zalgebra");
 usingnamespace Vulkan.C;
 usingnamespace Vulkan.Utils;
-usingnamespace zui.Meta;
+usingnamespace @import("zui").Meta;
+
+const Buffer = Vulkan.Buffer;
 
 const Self = @This();
 
 layout: VkPipelineLayout,
 pipeline: VkPipeline,
+descriptorSets: VkDescriptorSet,
+descriptorLayout: VkDescriptorSetLayout,
+descriptorPool: VkDescriptorPool,
+buffers: Buffer.From(Camera, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT),
 
-pub fn init(ctx: Context, renderPass: VkRenderPass) !Self {
-    const vert_code align(4) = @embedFile("shaders/vert.spv").*;
-    const frag_code align(4) = @embedFile("shaders/frag.spv").*;
+pub fn init(vulkan: Vulkan, renderPass: VkRenderPass) !Self {
+    var camera = Camera.new(@intToFloat(f32, vulkan.swapchain.extent.width), @intToFloat(f32, vulkan.swapchain.extent.height), 400);
+    var buffers = try Buffer.From(Camera, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT).init(vulkan, &[_]Camera{camera});
 
-    const vert_module = try Vulkan.createShaderModule(ctx.vulkan.device, &vert_code);
-    defer vkDestroyShaderModule(ctx.vulkan.device, vert_module, null);
+    // Descriptors
+    var descriptorLayout: VkDescriptorSetLayout = undefined;
+    var descriptorPool: VkDescriptorPool = undefined;
+    var descriptorSets: VkDescriptorSet = undefined;
 
-    const frag_module = try Vulkan.createShaderModule(ctx.vulkan.device, &frag_code);
-    defer vkDestroyShaderModule(ctx.vulkan.device, frag_module, null);
+    const CameraBufferLayout = VkDescriptorSetLayoutBinding{
+        .binding = 0,
+        .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptorCount = 1,
+        .stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+        .pImmutableSamplers = null,
+    };
+
+    const descriptorInfo = VkDescriptorSetLayoutCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+        .bindingCount = 1,
+        .pBindings = &[_]VkDescriptorSetLayoutBinding{CameraBufferLayout},
+        .pNext = null,
+        .flags = 0,
+    };
+
+    try checkSuccess(
+        vkCreateDescriptorSetLayout(vulkan.device, &descriptorInfo, null, &descriptorLayout),
+        error.VulkanPipelineLayoutCreationFailed,
+    );
+
+    var poolSizes = [1]VkDescriptorPoolSize{VkDescriptorPoolSize{
+        .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptorCount = 1,
+    }};
+
+    const poolInfo = VkDescriptorPoolCreateInfo{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+        .poolSizeCount = 1,
+        .pPoolSizes = &poolSizes,
+        .maxSets = @intCast(u32, vulkan.swapchain.images.len),
+        .pNext = null,
+        .flags = 0,
+    };
+
+    try checkSuccess(vkCreateDescriptorPool(vulkan.device, &poolInfo, null, &descriptorPool), error.VulkanDescriptorPoolFailed);
+
+    const descriptorAllocation = VkDescriptorSetAllocateInfo{
+        .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+        .descriptorPool = descriptorPool,
+        .descriptorSetCount = 1,
+        .pSetLayouts = &descriptorLayout,
+        .pNext = null,
+    };
+
+    try checkSuccess(vkAllocateDescriptorSets(vulkan.device, &descriptorAllocation, &descriptorSets), error.DescriptorAllocationFailed);
+
+    const descriptorWriteUniform = VkWriteDescriptorSet{
+        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        .dstSet = descriptorSets,
+        .dstBinding = 0,
+        .dstArrayElement = 0,
+        .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        .descriptorCount = 1,
+        .pBufferInfo = &VkDescriptorBufferInfo{
+            .buffer = buffers.buffer,
+            .offset = 0,
+            .range = @sizeOf(Camera),
+        },
+        .pImageInfo = null,
+        .pTexelBufferView = null,
+        .pNext = null,
+    };
+
+    vkUpdateDescriptorSets(vulkan.device, 1, &[_]VkWriteDescriptorSet{descriptorWriteUniform}, 0, null);
+
+    // Pipeline
+
+    const vert_code align(4) = @embedFile("./shaders/vert.spv").*;
+    const frag_code align(4) = @embedFile("./shaders/frag.spv").*;
+
+    const vert_module = try Vulkan.createShaderModule(vulkan.device, &vert_code);
+    defer vkDestroyShaderModule(vulkan.device, vert_module, null);
+
+    const frag_module = try Vulkan.createShaderModule(vulkan.device, &frag_code);
+    defer vkDestroyShaderModule(vulkan.device, frag_module, null);
 
     const vert_stage_info = VkPipelineShaderStageCreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -48,22 +131,20 @@ pub fn init(ctx: Context, renderPass: VkRenderPass) !Self {
         .stride = @sizeOf(Vertex),
         .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
     };
-
     const attr_descs = [2]VkVertexInputAttributeDescription{
         VkVertexInputAttributeDescription{
             .binding = 0,
             .location = 0,
             .format = VK_FORMAT_R32G32B32_SFLOAT,
-            .offset = @offsetOf(Vertex, "position"),
+            .offset = @offsetOf(Vertex, "pos"),
         },
         VkVertexInputAttributeDescription{
             .binding = 0,
             .location = 1,
-            .format = VK_FORMAT_R32G32B32A32_SFLOAT,
+            .format = VK_FORMAT_R32G32B32_SFLOAT,
             .offset = @offsetOf(Vertex, "color"),
         },
     };
-
     const vertex_input_info = VkPipelineVertexInputStateCreateInfo{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
         .pNext = null,
@@ -85,15 +166,15 @@ pub fn init(ctx: Context, renderPass: VkRenderPass) !Self {
     const viewport = VkViewport{
         .x = 0.0,
         .y = 0.0,
-        .width = @intToFloat(f32, ctx.vulkan.swapchain.extent.width),
-        .height = @intToFloat(f32, ctx.vulkan.swapchain.extent.height),
+        .width = @intToFloat(f32, vulkan.swapchain.extent.width),
+        .height = @intToFloat(f32, vulkan.swapchain.extent.height),
         .minDepth = 0.0,
         .maxDepth = 1.0,
     };
 
     const scissor = VkRect2D{
         .offset = VkOffset2D{ .x = 0, .y = 0 },
-        .extent = ctx.vulkan.swapchain.extent,
+        .extent = vulkan.swapchain.extent,
     };
 
     const viewport_state = VkPipelineViewportStateCreateInfo{
@@ -175,14 +256,14 @@ pub fn init(ctx: Context, renderPass: VkRenderPass) !Self {
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .pNext = null,
         .flags = 0,
-        .setLayoutCount = 0,
-        .pSetLayouts = null,
+        .setLayoutCount = 1,
+        .pSetLayouts = &descriptorLayout,
         .pushConstantRangeCount = 0,
         .pPushConstantRanges = null,
     };
     var pipeline_layout: VkPipelineLayout = undefined;
     try checkSuccess(
-        vkCreatePipelineLayout(ctx.vulkan.device, &pipeline_layout_info, null, &pipeline_layout),
+        vkCreatePipelineLayout(vulkan.device, &pipeline_layout_info, null, &pipeline_layout),
         error.VulkanPipelineLayoutCreationFailed,
     );
 
@@ -207,19 +288,27 @@ pub fn init(ctx: Context, renderPass: VkRenderPass) !Self {
         .basePipelineHandle = null,
         .basePipelineIndex = -1,
     };
+
     var pipeline: VkPipeline = undefined;
     try checkSuccess(
-        vkCreateGraphicsPipelines(ctx.vulkan.device, null, 1, &pipeline_info, null, &pipeline),
+        vkCreateGraphicsPipelines(vulkan.device, null, 1, &pipeline_info, null, &pipeline),
         error.VulkanPipelineCreationFailed,
     );
 
     return Self{
+        .descriptorSets = descriptorSets,
+        .descriptorLayout = descriptorLayout,
+        .descriptorPool = descriptorPool,
+        .buffers = buffers,
         .layout = pipeline_layout,
         .pipeline = pipeline,
     };
 }
 
-pub fn deinit(self: Self, ctx: Context) void {
-    vkDestroyPipeline(ctx.vulkan.device, self.pipeline, null);
-    vkDestroyPipelineLayout(ctx.vulkan.device, self.layout, null);
+pub fn deinit(self: Self, vulkan: Vulkan) void {
+    self.buffers.deinit(vulkan);
+    vkDestroyDescriptorSetLayout(vulkan.device, self.descriptorLayout, null);
+    vkDestroyDescriptorPool(vulkan.device, self.descriptorPool, null);
+    vkDestroyPipeline(vulkan.device, self.pipeline, null);
+    vkDestroyPipelineLayout(vulkan.device, self.layout, null);
 }
