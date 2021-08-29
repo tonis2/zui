@@ -3,6 +3,16 @@ const std = @import("std");
 
 usingnamespace @import("zalgebra");
 
+pub fn bubbleSort(comptime listType: type, list: *std.ArrayList(listType), compare: fn compareFn(firstValue: anytype, secondValue: anytype) bool) void {
+    for (list.items) |_| {
+        for (list.items) |item, index| {
+            if (index == list.items.len - 1) break;
+            if (compare(item, list.items[index + 1])) {
+                std.mem.swap(listType, &list.items[index], &list.items[index + 1]);
+            }
+        }
+    }
+}
 
 // *
 // Iter over all the all the list items and find the matching type from CustomElements registry, then fire their update or render fn

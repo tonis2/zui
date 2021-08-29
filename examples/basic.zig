@@ -35,11 +35,15 @@ pub fn main() !void {
     var result = DrawBuffer.new(allocator);
     defer result.deinit();
 
-    try result.drawRectangle(100, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0));
-    try result.drawRectangle(500, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0));
+    try result.drawRectangle(100, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{ .shader = 2 });
+    try result.drawRectangle(310, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{ .shader = 2 });
+    try result.drawRectangle(520, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{ .shader = 1 });
+    try result.drawRectangle(730, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{ .shader = 1 });
+
+    // Sort draw calls
+    result.build();
 
     // Initialize Vulkan
-
     const window = try Window.init(App.width, App.height);
     errdefer window.deinit();
 
