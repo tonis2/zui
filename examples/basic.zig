@@ -1,4 +1,3 @@
-const zui = @import("zui");
 const std = @import("std");
 const Vulkan = @import("vulkan");
 
@@ -9,9 +8,7 @@ const Window = Vulkan.Window;
 usingnamespace Vulkan.C;
 usingnamespace Vulkan.Utils;
 
-const DrawBuffer = zui.DrawBuffer;
-usingnamespace zui.Meta;
-usingnamespace zui.Elements;
+usingnamespace @import("zui");
 usingnamespace @import("zalgebra");
 
 pub const Pipeline = @import("backend/pipeline.zig");
@@ -23,27 +20,27 @@ var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 const allocator = &gpa.allocator;
 
 const State = struct {
-    name: []const u8,
+    name: []const u8 = "test",
 };
 
-var App: zui.App(State) = .{ .state = .{ .name = "test" }, .width = 1400.0, .height = 800.0 };
+var application: App(State) = .{ .state = State{}, .width = 1400.0, .height = 800.0 };
 
 pub fn main() !void {
     defer std.debug.assert(!gpa.deinit());
 
     // Build GUI elements
-    var result = DrawBuffer.new(allocator);
-    defer result.deinit();
+    var canvas = DrawList.init(allocator);
+    defer canvas.deinit();
 
-    _ = try result.drawRectangle(100, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{});
-    _ = try result.drawRectangle(310, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{});
-    _ = try result.drawRectangle(520, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{});
-    _ = try result.drawRectangle(730, 200, 200, 200, Vec4.new(1.0, 1.0, 1.0, 1.0), .{});
+    try canvas.draw(.Rectangle, .{ .width = 100, .height = 100, .x = 10, .y = 10 });
+    try canvas.draw(.Rectangle, .{ .width = 100, .height = 100, .x = 120, .y = 10 });
+    try canvas.draw(.Triangle, .{ .width = 100, .height = 100, .x = 10, .y = 120 });
 
-    // try result.removeDraw(1);
-    try result.removeDraw(2);
+    var canvas_buffer = try canvas.build(allocator);
+    defer canvas_buffer.deinit();
+
     // Initialize Vulkan
-    const window = try Window.init(App.width, App.height);
+    const window = try Window.init(application.width, application.height);
     errdefer window.deinit();
 
     var vulkan = try Vulkan.init(allocator, window);
@@ -54,8 +51,8 @@ pub fn main() !void {
 
     const renderpass = try Renderpass.init(vulkan);
     const pipeline = try Pipeline.init(vulkan, renderpass.renderpass);
-    const vertex_buffer = try Buffer.From(Vertex, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT).init(vulkan, result.vertices.items);
-    const index_buffer = try Buffer.From(u16, VK_BUFFER_USAGE_INDEX_BUFFER_BIT).init(vulkan, result.indices.items);
+    const vertex_buffer = try Buffer.From(Meta.Vertex, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT).init(vulkan, canvas_buffer.vertices.items);
+    const index_buffer = try Buffer.From(u16, VK_BUFFER_USAGE_INDEX_BUFFER_BIT).init(vulkan, canvas_buffer.indices.items);
 
     defer {
         _ = vkDeviceWaitIdle(vulkan.device);

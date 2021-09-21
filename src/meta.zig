@@ -45,13 +45,9 @@ pub const Element = struct {
 
 pub const Vertex = struct {
     pos: Vec3,
-    color: Vec4,
+    color: [4]f32,
     pub fn zero() Vertex {
-        return Vertex{ .pos = Vec3.new(0.0, 0.0, 0.0), .color = Vec4.new(0.0, 0.0, 0.0, 0.0) };
-    }
-    pub fn into_zero(self: *Vertex) void {
-        self.pos = Vec3.new(0.0, 0.0, 0.0);
-        self.color = Vec4.new(0.0, 0.0, 0.0, 0.0);
+        return Vertex{ .pos = Vec3.new(0.0, 0.0, 0.0), .color = [4]f32{ 0.0, 0.0, 0.0, 0.0 } };
     }
 };
 
