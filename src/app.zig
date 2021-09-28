@@ -1,3 +1,5 @@
-pub fn App(comptime state: type) type {
-    return struct { state: state = null, width: u32 = 100.0, height: u32 = 100.0, title: []const u8 = "App" };
-}
+width: u32 = 100.0,
+height: u32 = 100.0,
+title: []const u8 = "App",
+x: u32 = 100.0,
+y: u32 = 100.0,

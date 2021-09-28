@@ -1,11 +1,11 @@
 const std = @import("std");
-const Layout = @import("layout.zig");
 const Allocator = std.mem.Allocator;
 
 usingnamespace @import("zalgebra");
-usingnamespace @import("./meta.zig");
+usingnamespace @import("primitives.zig");
+usingnamespace @import("meta.zig");
 
-pub const DrawCategory = enum {
+const DrawCategoryTag = enum {
     Rectangle,
     Triangle,
     Circle,
@@ -13,45 +13,43 @@ pub const DrawCategory = enum {
     Text,
 };
 
-const DrawItem = struct {
-    layout: u32,
-    category: DrawCategory,
+pub const DrawCategory = union(DrawCategoryTag) {
+    Rectangle: Rectangle,
+    Triangle: Rectangle,
+    Circle: Circle,
+    Line,
+    Text,
 };
 
 pub const DrawList = struct {
-    categories: std.ArrayList(DrawItem),
-    layouts: std.ArrayList(Layout),
+    categories: std.ArrayList(DrawCategory),
 
     pub fn init(allocator: *Allocator) DrawList {
-        return DrawList{ .categories = std.ArrayList(DrawItem).init(allocator), .layouts = std.ArrayList(Layout).init(allocator) };
+        return DrawList{ .categories = std.ArrayList(DrawCategory).init(allocator) };
     }
 
-    pub fn draw(self: *DrawList, category: DrawCategory, layout: Layout) !void {
-        try self.layouts.append(layout);
-        try self.categories.append(DrawItem{ .layout = @intCast(u32, self.layouts.items.len - 1), .category = category });
+    pub fn draw(self: *DrawList, category: DrawCategory) !void {
+        try self.categories.append(category);
     }
 
     pub fn clear(self: *DrawList) void {
         self.categories.clearAndFree();
-        self.layouts.clearAndFree();
     }
 
     pub fn deinit(self: *DrawList) void {
         self.categories.deinit();
-        self.layouts.deinit();
     }
 
     pub fn build(self: DrawList, allocator: *Allocator) !DrawBuffer {
         var drawBuffer = DrawBuffer.new(allocator);
 
         for (self.categories.items) |item| {
-            const layout: Layout = self.layouts.items[item.layout];
-            switch (item.category) {
-                .Rectangle => {
-                    try drawBuffer.drawRectangle(layout.x, layout.width, layout.y, layout.height, layout.background.raw());
+            switch (item) {
+                .Rectangle => |data| {
+                    try drawBuffer.drawRectangle(data.x, data.width, data.y, data.height, data.color.raw());
                 },
-                .Triangle => {
-                    try drawBuffer.drawTriangle(layout.x, layout.width, layout.y, layout.height, layout.background.raw());
+                .Triangle => |data| {
+                    try drawBuffer.drawTriangle(data.x, data.width, data.y, data.height, data.color.raw());
                 },
                 .Circle => {},
                 .Line => {},

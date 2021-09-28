@@ -23,7 +23,7 @@ const State = struct {
     name: []const u8 = "test",
 };
 
-var application: App(State) = .{ .state = State{}, .width = 1400.0, .height = 800.0 };
+var application: App = .{ .width = 1400.0, .height = 800.0 };
 
 pub fn main() !void {
     defer std.debug.assert(!gpa.deinit());
@@ -32,9 +32,9 @@ pub fn main() !void {
     var canvas = DrawList.init(allocator);
     defer canvas.deinit();
 
-    try canvas.draw(.Rectangle, .{ .width = 100, .height = 100, .x = 10, .y = 10 });
-    try canvas.draw(.Rectangle, .{ .width = 100, .height = 100, .x = 120, .y = 10 });
-    try canvas.draw(.Triangle, .{ .width = 100, .height = 100, .x = 10, .y = 120 });
+    try canvas.draw(.{ .Rectangle = .{ .width = 100, .height = 100, .x = 10, .y = 10 } });
+    try canvas.draw(.{ .Rectangle = .{ .width = 100, .height = 100, .x = 120, .y = 10 } });
+    try canvas.draw(.{ .Triangle = .{ .width = 100, .height = 100, .x = 10, .y = 120 } });
 
     var canvas_buffer = try canvas.build(allocator);
     defer canvas_buffer.deinit();
